@@ -1,0 +1,58 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Microsoft JhengHei", "Segoe UI", system-ui, sans-serif; color: #222; background: #f5f6f8; }
+[hidden] { display: none !important; }
+.up { color: #e53935; }
+.down { color: #43a047; }
+.flat { color: #757575; }
+
+.login-box { width: 320px; margin: 15vh auto 0; padding: 28px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.1); display: flex; flex-direction: column; gap: 14px; }
+.login-box h1 { margin: 0 0 4px; font-size: 22px; text-align: center; }
+.login-box label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font: inherit; }
+button { padding: 8px 16px; border: 0; border-radius: 4px; background: #1565c0; color: #fff; font: inherit; cursor: pointer; }
+button:disabled { opacity: .6; cursor: default; }
+.error { min-height: 1.2em; margin: 0; color: #e53935; font-size: 14px; }
+
+#nav { display: flex; align-items: center; gap: 4px; padding: 0 20px; height: 52px; background: #1f2d3d; color: #fff; }
+#nav .brand { font-weight: bold; font-size: 18px; margin-right: 24px; }
+#nav a { color: #cfd8dc; text-decoration: none; padding: 16px 14px; border-bottom: 3px solid transparent; }
+#nav a:hover { color: #fff; }
+#nav a.active { color: #fff; border-bottom-color: #4fc3f7; background: rgba(255,255,255,.08); }
+#nav .spacer { flex: 1; }
+#nav #nav-user { margin-right: 12px; }
+#nav button { background: #455a64; padding: 6px 12px; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; }
+#perf-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 8px 20px; background: #eceff1; border-top: 1px solid #cfd8dc; color: #455a64; font-size: 13px; min-height: 34px; }
+
+.query-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+.query-form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.chart-box { height: 380px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #757575; margin-bottom: 16px; }
+.table-box { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+.data-table th, .data-table td { padding: 6px 10px; border-bottom: 1px solid #eceff1; text-align: left; }
+.data-table th { background: #eceff1; }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 下單頁與持股頁 */
+.cards { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.card { background: #fff; border-radius: 6px; padding: 12px 18px; min-width: 150px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.card-label { font-size: 13px; color: #607d8b; margin-bottom: 4px; }
+.card-value { font-size: 20px; font-weight: bold; font-variant-numeric: tabular-nums; }
+.order-info { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+.side-wrap { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.side-toggle { display: flex; gap: 14px; padding: 8px 0; }
+.side-opt { flex-direction: row !important; align-items: center; gap: 4px !important; }
+.order-msg { margin: 8px 0 16px; min-height: 1.2em; }
+.order-msg.success { color: #2e7d32; font-weight: bold; }
+.empty { color: #757575; }
+
+/* 效能分析頁 */
+.bench-conclusion { font-size: 18px; font-weight: bold; margin: 8px 0 16px; }
+.bench-bars { margin: 20px 0 8px; display: flex; flex-direction: column; gap: 10px; }
+.bench-row { display: flex; align-items: center; gap: 12px; }
+.bench-label { width: 90px; font-size: 14px; }
+.bench-track { flex: 1; background: #eceff1; border-radius: 4px; height: 22px; }
+.bench-bar { height: 100%; border-radius: 4px; }
+.bench-value { width: 80px; text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
+.bench-note { color: #607d8b; font-size: 13px; }

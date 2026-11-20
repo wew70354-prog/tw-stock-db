@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台股歷史資料庫</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="login-view" hidden>
+    <form id="login-form" class="login-box" autocomplete="off">
+      <h1>台股歷史資料庫</h1>
+      <label>帳號<input name="username" type="text" required autofocus></label>
+      <label>密碼<input name="password" type="password" required></label>
+      <button id="login-btn" type="submit">登入</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="app-view" hidden>
+    <header id="nav">
+      <span class="brand">台股歷史資料庫</span>
+      <a href="#query" data-page="query">個股查詢</a>
+      <a href="#order" data-page="order">模擬下單</a>
+      <a href="#holdings" data-page="holdings">我的持股</a>
+      <a href="#bench" data-page="bench">效能分析</a>
+      <span class="spacer"></span>
+      <span id="nav-user"></span>
+      <button id="logout-btn" type="button">登出</button>
+    </header>
+    <main>
+      <section id="tab-query" class="tab"><h2>個股查詢</h2></section>
+      <section id="tab-order" class="tab" hidden><h2>模擬下單</h2></section>
+      <section id="tab-holdings" class="tab" hidden><h2>我的持股</h2></section>
+      <section id="tab-bench" class="tab" hidden><h2>效能分析</h2></section>
+    </main>
+    <footer id="perf-bar"></footer>
+  </div>
+
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/format.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/pages/query.js"></script>
+  <script src="js/pages/order.js"></script>
+  <script src="js/pages/holdings.js"></script>
+  <script src="js/pages/bench.js"></script>
+</body>
+</html>
