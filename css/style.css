@@ -56,3 +56,21 @@ main { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; }
 .bench-bar { height: 100%; border-radius: 4px; }
 .bench-value { width: 80px; text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
 .bench-note { color: #607d8b; font-size: 13px; }
+
+/* 手機版（螢幕寬度 700px 以下）：導覽列改兩排，分頁平均排在第二排 */
+@media (max-width: 700px) {
+  #nav { flex-wrap: wrap; height: auto; padding: 0 10px; gap: 0; }
+  #nav .brand { order: 0; margin-right: 0; padding: 10px 0; font-size: 16px; }
+  #nav .spacer { order: 1; }
+  #nav #nav-user { order: 2; margin-right: 8px; font-size: 14px; }
+  #nav button { order: 3; }
+  #nav::after { content: ""; order: 4; flex-basis: 100%; height: 0; }  /* 強制換行 */
+  #nav a { order: 5; flex: 0 0 25%; text-align: center; padding: 10px 0; font-size: 14px; white-space: nowrap; }
+  main { padding: 12px 10px 70px; }
+  .login-box { width: auto; margin: 10vh 16px 0; }
+  .query-form label, .side-wrap { flex: 1 1 140px; }
+  .chart-box { height: 300px; }
+  .card { flex: 1 1 140px; min-width: 0; }
+  .bench-label { width: 64px; }
+  .bench-value { width: 64px; }
+}
