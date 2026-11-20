@@ -74,3 +74,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; }
   .bench-label { width: 64px; }
   .bench-value { width: 64px; }
 }
+
+/* 賣出時的持股清單：整列可點 */
+.pick-table tbody tr { cursor: pointer; }
+.pick-table tbody tr:hover, .pick-table tbody tr:focus { background: #e3f2fd; outline: none; }
+.pick-table tbody tr.picked { background: #bbdefb; }

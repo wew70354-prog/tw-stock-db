@@ -62,9 +62,15 @@ var OrderPage = {
     msg.setAttribute('role', 'status');
     var title = mk('h3', '委託紀錄');
     var tableBox = mk('div', '', 'table-box');
-    [form, info, msg, title, tableBox].forEach(function (n) { root.appendChild(n); });
+    // 選「賣出」時改顯示持股清單，點一列就把股票和數量帶到上方表單
+    var holdTitle = mk('h3', '我的持股（點選要賣的股票）');
+    var holdBox = mk('div', '', 'table-box');
+    holdTitle.hidden = true; holdBox.hidden = true;
+    [form, info, msg, title, tableBox, holdTitle, holdBox].forEach(function (n) { root.appendChild(n); });
 
-    OrderPage.els = { form: form, stock: stock, side: side, qty: qty, btn: btn, info: info, msg: msg, table: tableBox };
+    OrderPage.els = { form: form, stock: stock, side: side, qty: qty, btn: btn, info: info, msg: msg, table: tableBox,
+      title: title, holdTitle: holdTitle, holdBox: holdBox };
+    side.addEventListener('change', OrderPage.showSideView);
     stock.addEventListener('change', OrderPage.refreshInfo);
     qty.addEventListener('input', OrderPage.refreshInfo);
     form.addEventListener('submit', function (ev) { ev.preventDefault(); OrderPage.submit(); });
@@ -103,6 +109,7 @@ var OrderPage = {
     return Promise.all([OrderPage.getQuote(id), posP]).then(function (res) {
       if (seq !== OrderPage._quoteSeq) return;
       OrderPage.renderInfo(res[0], res[1]);
+      if (OrderPage.getSide() === 'SELL') OrderPage.renderHoldings(res[1]);
     }).catch(function (err) {
       if (seq !== OrderPage._quoteSeq) return;
       throw err;
@@ -166,6 +173,85 @@ var OrderPage = {
     box.appendChild(table);
   },
 
+  // 持股清單的每一列（純計算，方便測試）
+  sellRows: function (pos) {
+    return pos.holdings.map(function (h) {
+      var value = Fmt.round2(h.quantity * h.close);
+      return {
+        stock_id: h.stock_id,
+        label: h.stock_id + (h.stock_name ? ' ' + h.stock_name : ''),
+        quantity: h.quantity,
+        avg_cost: h.avg_cost,
+        close: h.close,
+        value: value,
+        pnl: Fmt.round2(value - h.quantity * h.avg_cost)
+      };
+    });
+  },
+
+  // 點選持股：把股票與全部持股數帶到上方表單（數量可再修改）
+  pickHolding: function (row) {
+    var e = OrderPage.els;
+    e.stock.value = row.stock_id;
+    e.qty.value = String(row.quantity);
+    e.msg.className = 'error order-msg';
+    e.msg.textContent = '';
+    OrderPage.refreshInfo();
+    e.qty.focus();
+    e.qty.select();
+    if (e.form.scrollIntoView) e.form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  },
+
+  renderHoldings: function (pos) {
+    var mk = OrderPage.el;
+    var box = OrderPage.els.holdBox;
+    var current = OrderPage.els.stock.value;
+    box.textContent = '';
+    var rows = OrderPage.sellRows(pos);
+    if (rows.length === 0) { box.appendChild(mk('p', '目前沒有持股可以賣出', 'empty')); return; }
+    var table = mk('table', '', 'data-table pick-table');
+    var head = mk('tr');
+    ['股票', '持有股數', '平均成本', '最新收盤', '市值', '未實現損益'].forEach(function (h) { head.appendChild(mk('th', h)); });
+    var thead = mk('thead');
+    thead.appendChild(head);
+    table.appendChild(thead);
+    var tbody = mk('tbody');
+    rows.forEach(function (r) {
+      var tr = mk('tr', '', r.stock_id === current ? 'picked' : '');
+      tr.tabIndex = 0;
+      tr.title = '點一下帶入賣出 ' + Fmt.int(r.quantity) + ' 股';
+      tr.appendChild(mk('td', r.label));
+      tr.appendChild(mk('td', Fmt.int(r.quantity), 'num'));
+      tr.appendChild(mk('td', Fmt.num(r.avg_cost), 'num'));
+      tr.appendChild(mk('td', Fmt.num(r.close), 'num'));
+      tr.appendChild(mk('td', Fmt.num(r.value), 'num'));
+      tr.appendChild(mk('td', Fmt.num(r.pnl), 'num ' + Fmt.signClass(r.pnl)));
+      tr.addEventListener('click', function () { OrderPage.pickHolding(r); });
+      tr.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); OrderPage.pickHolding(r); }
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    box.appendChild(table);
+  },
+
+  // 依買賣切換下方區塊：買進看委託紀錄，賣出看持股清單
+  showSideView: function () {
+    var e = OrderPage.els;
+    var sell = OrderPage.getSide() === 'SELL';
+    e.title.hidden = sell; e.table.hidden = sell;
+    e.holdTitle.hidden = !sell; e.holdBox.hidden = !sell;
+    if (!sell) return Promise.resolve();
+    var posP = OrderPage._positions ? Promise.resolve(OrderPage._positions) : OrderPage.loadPositions();
+    return posP.then(OrderPage.renderHoldings).catch(function (err) {
+      e.holdBox.textContent = '';
+      e.msg.className = 'error order-msg';
+      e.msg.textContent = OrderPage.errorText(err && err.code);
+      App.showError(err);
+    });
+  },
+
   loadOrders: function () {
     return Api.call('orders').then(function (r) { OrderPage.renderOrders(r.data); });
   },
@@ -215,6 +301,7 @@ var OrderPage = {
     e.info.textContent = '';
     e.msg.textContent = '';
     e.table.textContent = '';
+    e.holdBox.textContent = '';
   },
 
   onShow: function () {
@@ -238,7 +325,7 @@ var OrderPage = {
       });
     }
     return ready.then(function () {
-      return Promise.all([OrderPage.refreshInfo(), OrderPage.loadOrders()]);
+      return Promise.all([OrderPage.refreshInfo(), OrderPage.loadOrders(), OrderPage.showSideView()]);
     }).catch(function (err) {
       e.msg.className = 'error order-msg';
       e.msg.textContent = OrderPage.errorText(err && err.code);
