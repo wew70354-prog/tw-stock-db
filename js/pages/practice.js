@@ -121,6 +121,7 @@ var Practice = {
   },
 
   clearUser: function () {
+    if (typeof Sprite !== 'undefined') Sprite.hide();
     Practice._game = null;
     Practice._busy = false;
     if (Practice.root) Practice.reset();
@@ -145,6 +146,7 @@ var Practice = {
   showLobby: function () {
     var mk = Practice.el;
     var root = Practice.reset();
+    if (typeof Sprite !== 'undefined') Sprite.hide();
     Practice._game = null;
     var rules = mk('ul', '', 'practice-rules');
     [
@@ -260,7 +262,15 @@ var Practice = {
     var rows = Practice.toRows(g.bars);
     var handle = PriceChart.create(e.chart, rows, { timeLabel: timeLabel });
     Practice._charts.push(handle);
-    Practice._charts.push(IndicatorPanel.attach(e.indBar, e.subChart, rows, handle, { timeLabel: timeLabel }));
+    var note = g.days_done === 0 ? '依前導資料最後一天判斷，只用畫面上看得到的資料。'
+      : '依第 ' + g.days_done + ' 天收盤後的畫面判斷，只用已揭曉的資料。';
+    var panel = IndicatorPanel.attach(e.indBar, e.subChart, rows, handle, {
+      timeLabel: timeLabel,
+      onChange: function (s) { Sprite.update(rows, s, note); }
+    });
+    Practice._charts.push(panel);
+    Sprite.mount(Practice.root);
+    Sprite.update(rows, panel.state, note);
     e.list.textContent = '';
     if (g.steps.length === 0) { e.list.appendChild(mk('p', '還沒有揭曉任何一天', 'empty')); return; }
     var byDay = {};
@@ -417,7 +427,13 @@ var Practice = {
     [kBar, kBox, kSub].forEach(function (n) { root.appendChild(n); });
     var kHandle = PriceChart.create(kBox, review.real_bars, { markers: Practice.markers(review.steps) });
     Practice._charts.push(kHandle);
-    Practice._charts.push(IndicatorPanel.attach(kBar, kSub, review.real_bars, kHandle));
+    var reviewNote = '回顧：依這局最後一天的真實 K 線判斷。';
+    var kPanel = IndicatorPanel.attach(kBar, kSub, review.real_bars, kHandle, {
+      onChange: function (s) { Sprite.update(review.real_bars, s, reviewNote); }
+    });
+    Practice._charts.push(kPanel);
+    Sprite.mount(Practice.root);
+    Sprite.update(review.real_bars, kPanel.state, reviewNote);
     root.appendChild(mk('p', '提醒：價格未還原除權息，除息日可能出現跳空，請自行判斷。', 'bench-note'));
 
     root.appendChild(mk('h3', '逐日回顧'));

@@ -162,3 +162,30 @@ button.ind-tg.on { background: #1565c0; border-color: #1565c0; color: #fff; }
 button.ind-tg i { display: inline-block; width: 10px; height: 3px; margin-right: 5px; vertical-align: middle; border-radius: 2px; }
 .chart-box.with-sub { margin-bottom: 6px; }
 .chart-sub { height: 150px; }
+
+/* 交易練習：看盤小精靈（固定在右下角，效能資訊列上方） */
+.sprite { position: fixed; right: 18px; bottom: 48px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none; }
+.sprite-me, .sprite-bubble:not(.closed) { pointer-events: auto; }   /* 外框不擋住下面的圖表，只有精靈和打開的對話框可以點 */
+.sprite-bubble { width: min(330px, calc(100vw - 24px)); background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.22); overflow: hidden; transform-origin: bottom right; transition: transform .2s, opacity .2s; }
+.sprite-bubble.closed { transform: scale(.6); opacity: 0; pointer-events: none; visibility: hidden; }
+.sprite-head { background: linear-gradient(90deg, #1e88e5, #4fc3f7); color: #fff; padding: 10px 14px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sprite-head small { opacity: .9; font-size: 11px; }
+.sprite-tabs { display: flex; border-bottom: 1px solid #eceff1; }
+.sprite-tabs button { flex: 1; padding: 8px 0; background: none; border-radius: 0; color: #607d8b; font-size: 13px; border-bottom: 2px solid transparent; }
+.sprite-tabs button.on { color: #1565c0; border-bottom-color: #1565c0; font-weight: bold; }
+.sprite-body { max-height: min(280px, 50vh); overflow-y: auto; padding: 6px 14px 10px; font-size: 13px; line-height: 1.6; color: #37474f; }
+.sprite-item { padding: 8px 0; border-bottom: 1px dashed #eceff1; }
+.sprite-item:last-child { border-bottom: 0; }
+.sprite-title { font-weight: bold; color: #263238; margin-bottom: 2px; }
+.sprite-tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 8px; margin-right: 6px; vertical-align: 1px; font-weight: normal; }
+.sprite-tag.hot { background: #ffebee; color: #c62828; }
+.sprite-tag.cold { background: #e8f5e9; color: #2e7d32; }
+.sprite-tag.info { background: #e3f2fd; color: #1565c0; }
+.sprite-foot { font-size: 11px; color: #90a4ae; padding: 6px 14px 10px; border-top: 1px solid #eceff1; display: flex; justify-content: space-between; align-items: center; min-height: 30px; }
+.sprite-next { background: none; color: #1565c0; padding: 0; font-size: 12px; }
+.sprite-me { position: relative; width: 68px; height: 68px; padding: 0; background: none; border-radius: 50%; animation: spriteFloat 3s ease-in-out infinite; }
+.sprite-me:focus-visible { outline: 2px solid #1565c0; outline-offset: 2px; }
+@keyframes spriteFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.sprite-badge { position: absolute; top: 0; right: 0; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #e53935; color: #fff; font-size: 12px; font-weight: bold; line-height: 20px; box-shadow: 0 0 0 2px #fff; }
+@media (max-width: 700px) { .sprite { right: 10px; bottom: 52px; } .sprite-me { width: 56px; height: 56px; } .sprite-me svg { width: 54px; height: 54px; } }
+@media (prefers-reduced-motion: reduce) { .sprite-me { animation: none; } .sprite-bubble { transition: none; } }

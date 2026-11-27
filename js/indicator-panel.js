@@ -98,7 +98,7 @@ var IndicatorPanel = {
     toolbarEl.textContent = '';
     subEl.textContent = '';
     if (!handle || !handle.chart || !rows || rows.length === 0 || typeof LightweightCharts === 'undefined') {
-      return { destroy: function () {} };
+      return { state: P.loadState(P.storage_()), destroy: function () {} };
     }
     var state = P.loadState(P.storage_());
     var main = handle.chart, overlays = [], sub = null, subSeries = [], stopWidth = function () {};
@@ -169,6 +169,7 @@ var IndicatorPanel = {
         b.classList.toggle('on', state[o.key]);
         P.saveState(P.storage_(), state);
         drawOverlays();
+        if (opts.onChange) opts.onChange(state);
       });
       toolbarEl.appendChild(b);
     });
@@ -179,6 +180,7 @@ var IndicatorPanel = {
         subBtns.forEach(function (x, j) { x.classList.toggle('on', P.SUBS[j] === k); });
         P.saveState(P.storage_(), state);
         drawSub();
+        if (opts.onChange) opts.onChange(state);
       });
     });
     subBtns.forEach(function (b) { toolbarEl.appendChild(b); });
@@ -186,6 +188,7 @@ var IndicatorPanel = {
     drawOverlays();
     drawSub();
     return {
+      state: state,
       destroy: function () {
         try { main.timeScale().unsubscribeVisibleLogicalRangeChange(mainToSub); } catch (e) { /* 主圖可能已先移除 */ }
         stopWidth();
