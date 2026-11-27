@@ -315,13 +315,8 @@ var OrderPage = {
     if (e.stock.options.length === 0) {
       ready = QueryPage.getStocks().then(function (list) {
         if (e.stock.options.length > 0) return;
-        list.forEach(function (s) {
-          OrderPage._stockMap[s.stock_id] = s.stock_name;
-          var o = document.createElement('option');
-          o.value = s.stock_id;
-          o.textContent = s.stock_id + ' ' + s.stock_name;
-          e.stock.appendChild(o);
-        });
+        list.forEach(function (s) { OrderPage._stockMap[s.stock_id] = s.stock_name; });
+        QueryPage.fillStockSelect(e.stock, list);
       });
     }
     return ready.then(function () {

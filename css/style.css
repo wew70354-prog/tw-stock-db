@@ -5,9 +5,6 @@ body { margin: 0; font-family: "Microsoft JhengHei", "Segoe UI", system-ui, sans
 .down { color: #43a047; }
 .flat { color: #757575; }
 
-.login-box { width: 320px; margin: 15vh auto 0; padding: 28px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.1); display: flex; flex-direction: column; gap: 14px; }
-.login-box h1 { margin: 0 0 4px; font-size: 22px; text-align: center; }
-.login-box label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
 input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font: inherit; }
 button { padding: 8px 16px; border: 0; border-radius: 4px; background: #1565c0; color: #fff; font: inherit; cursor: pointer; }
 button:disabled { opacity: .6; cursor: default; }
@@ -67,7 +64,6 @@ main { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; }
   #nav::after { content: ""; order: 4; flex-basis: 100%; height: 0; }  /* 強制換行 */
   #nav a { order: 5; flex: 0 0 20%; text-align: center; padding: 10px 0; font-size: 14px; white-space: nowrap; }
   main { padding: 12px 10px 70px; }
-  .login-box { width: auto; margin: 10vh 16px 0; }
   .query-form label, .side-wrap { flex: 1 1 140px; }
   .chart-box { height: 300px; }
   .card { flex: 1 1 140px; min-width: 0; }
@@ -97,3 +93,62 @@ button.secondary { background: #78909c; margin-top: 16px; }
 .chart-short { height: 260px; }
 .chart-legend { position: absolute; top: 8px; left: 12px; z-index: 3; display: flex; gap: 14px; font-size: 13px; background: rgba(255,255,255,.85); padding: 2px 6px; border-radius: 4px; color: #333; }
 .chart-legend i { display: inline-block; width: 12px; height: 3px; margin-right: 5px; vertical-align: middle; }
+
+/* 登入頁：左側看盤視覺（走勢線輪播＋網格）、右側登入卡片、上方報價跑馬燈 */
+.lg { min-height: 100vh; display: grid; grid-template-columns: 3fr 2fr; grid-template-rows: 34px 1fr; background: #0d1622; color: #e3eaf2; }
+.lg-tape { grid-column: 1 / -1; display: flex; align-items: center; overflow: hidden; white-space: nowrap; background: #08111b; border-bottom: 1px solid rgba(79,195,247,.2); font-size: 13px; }
+.lg-track { display: inline-flex; gap: 32px; padding-left: 32px; animation: lgPan 45s linear infinite; }
+.lg-track em { font-style: normal; margin-left: 6px; font-variant-numeric: tabular-nums; }
+.lg-track .r { color: #ef5350; }
+.lg-track .g { color: #26a69a; }
+.lg-track .asof { color: #4fc3f7; }
+@keyframes lgPan { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.lg-hero { position: relative; overflow: hidden; background: linear-gradient(160deg, #0b1420, #10263d 60%, #0b1420); }
+.lg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(79,195,247,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(79,195,247,.07) 1px, transparent 1px); background-size: 44px 44px; animation: lgGrid 8s linear infinite; }
+@keyframes lgGrid { to { background-position: -44px 0, -44px 0; } }
+.lg-plot { position: absolute; left: 0; right: 28px; bottom: 76px; height: 50%; }
+.lg-chart { display: block; width: 100%; height: 100%; overflow: visible; }
+.lg-line { transition: opacity .4s; }
+.lg-line.fading { opacity: 0; }
+.lg-area { fill: url(#lgFade); }
+.lg-stroke { fill: none; stroke: #4fc3f7; stroke-width: 2.5; stroke-linejoin: round; filter: drop-shadow(0 0 6px #4fc3f7); }
+.lg-dot { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: #4fc3f7; opacity: 0; transition: opacity .3s; }
+.lg-dot.on { opacity: 1; animation: lgPulse 1.6s infinite; }
+@keyframes lgPulse { from { box-shadow: 0 0 0 0 rgba(79,195,247,.7); } to { box-shadow: 0 0 0 18px rgba(79,195,247,0); } }
+.lg-title { position: absolute; left: 44px; top: 40px; }
+.lg-title h1 { margin: 0; font-size: 36px; color: #fff; letter-spacing: 2px; }
+.lg-title p { margin: 10px 0 0; color: #90a4ae; font-size: 14px; }
+.lg-legend { position: absolute; left: 44px; top: 136px; color: #4fc3f7; font-size: 13px; }
+.lg-legend::before { content: "— "; }
+.lg-feats { position: absolute; left: 44px; bottom: 24px; display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; }
+.lg-feats span { padding: 5px 12px; border-radius: 14px; background: rgba(79,195,247,.12); color: #81d4fa; }
+
+.lg-side { display: flex; align-items: center; justify-content: center; padding: 32px; background: #111d2b; }
+.login-box { width: 320px; padding: 32px; border-radius: 12px; background: #16263a; box-shadow: 0 12px 36px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 14px; }
+.login-box h2 { margin: 0; font-size: 24px; color: #fff; }
+.login-box .lg-sub { margin: -8px 0 4px; font-size: 13px; color: #90a4ae; }
+.login-box label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #b0bec5; }
+.login-box input { padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: #fff; }
+.login-box input:focus { outline: none; border-color: #4fc3f7; box-shadow: 0 0 0 3px rgba(79,195,247,.2); }
+.login-box button { margin-top: 6px; padding: 11px; border-radius: 6px; background: linear-gradient(90deg, #1e88e5, #4fc3f7); font-weight: bold; }
+.login-box .error { color: #ff8a80; }
+
+/* 登入頁手機版：改上下排，走勢區縮成橫幅 */
+@media (max-width: 767px) {
+  .lg { grid-template-columns: 1fr; grid-template-rows: 34px 220px 1fr; }
+  .lg-title { left: 20px; top: 20px; }
+  .lg-title h1 { font-size: 24px; }
+  .lg-title p { font-size: 12px; margin-top: 6px; }
+  .lg-legend { left: 20px; top: 84px; font-size: 12px; }
+  .lg-plot { bottom: 8px; height: 50%; }
+  .lg-feats { display: none; }
+  .lg-side { align-items: flex-start; padding: 24px 16px; }
+  .login-box { width: 100%; max-width: 380px; }
+}
+
+/* 使用者偏好減少動態效果：停掉持續性動畫（JS 端也會略過畫線動畫） */
+@media (prefers-reduced-motion: reduce) {
+  .lg-grid, .lg-track, .lg-dot.on { animation: none; }
+  .lg-line, .lg-dot { transition: none; }
+}

@@ -175,12 +175,7 @@ var Bench = {
     if (sel.options.length > 0) return;
     QueryPage.getStocks().then(function (list) {
       if (sel.options.length > 0) return;
-      list.forEach(function (s) {
-        var o = document.createElement('option');
-        o.value = s.stock_id;
-        o.textContent = s.stock_id + ' ' + s.stock_name;
-        sel.appendChild(o);
-      });
+      QueryPage.fillStockSelect(sel, list);
       sel.value = '2330';
     }).catch(function (err) {
       Bench.els.msg.textContent = (err && err.message) || '無法載入股票清單';

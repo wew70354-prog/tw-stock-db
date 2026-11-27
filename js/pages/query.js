@@ -14,6 +14,45 @@ var QueryPage = {
     return QueryPage._stocks;
   },
 
+  // 依產業分組：檔數多的組在前（同數量照清單中首次出現的順序），組內依代號；沒有產業的（0050）歸「ETF」放最後
+  groupStocks: function (list) {
+    var groups = [], byLabel = {}, etf = null;
+    list.forEach(function (s) {
+      var label = s.industry ? String(s.industry) : 'ETF';
+      var g = byLabel[label];
+      if (!g) {
+        g = byLabel[label] = { label: label, stocks: [] };
+        if (label === 'ETF') etf = g; else groups.push(g);
+      }
+      g.stocks.push(s);
+    });
+    groups = groups.map(function (g, i) { return { g: g, i: i }; }).sort(function (a, b) {
+      return b.g.stocks.length - a.g.stocks.length || a.i - b.i;
+    }).map(function (x) { return x.g; });
+    if (etf) groups.push(etf);
+    groups.forEach(function (g) {
+      g.stocks.sort(function (a, b) { return a.stock_id < b.stock_id ? -1 : a.stock_id > b.stock_id ? 1 : 0; });
+    });
+    return groups;
+  },
+
+  // 把股票清單填進 <select>，每個產業一個 <optgroup>（查詢、下單、效能比較三頁共用）
+  fillStockSelect: function (sel, list) {
+    QueryPage.groupStocks(list).forEach(function (g) {
+      var og = document.createElement('optgroup');
+      og.label = g.label + '（' + g.stocks.length + '）';
+      g.stocks.forEach(function (s) {
+        var o = document.createElement('option');
+        o.value = s.stock_id;
+        o.textContent = s.stock_id + ' ' + s.stock_name;
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+    // 分組後第一個選項不一定是清單第一檔；維持原本的預設（stocks 表第一檔，2330）
+    if (list.length > 0) sel.value = list[0].stock_id;
+  },
+
   pad: function (n) { return (n < 10 ? '0' : '') + n; },
   // 本地日期 YYYY-MM-DD
   dateStr: function (d) {
@@ -148,12 +187,7 @@ var QueryPage = {
     if (sel.options.length > 0) return;
     QueryPage.getStocks().then(function (list) {
       if (sel.options.length > 0) return;
-      list.forEach(function (s) {
-        var o = document.createElement('option');
-        o.value = s.stock_id;
-        o.textContent = s.stock_id + ' ' + s.stock_name;
-        sel.appendChild(o);
-      });
+      QueryPage.fillStockSelect(sel, list);
     }).catch(function (err) {
       QueryPage.els.msg.textContent = (err && err.message) || '無法載入股票清單';
       App.showError(err);
