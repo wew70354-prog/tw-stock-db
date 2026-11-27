@@ -180,7 +180,9 @@ var Practice = {
     var root = Practice.reset();
     Practice._game = game;
     var cards = mk('div', '', 'cards');
-    var chart = mk('div', '', 'chart-box');
+    var indBar = mk('div', '', 'ind-bar');
+    var chart = mk('div', '', 'chart-box with-sub');
+    var subChart = mk('div', '', 'chart-box chart-sub');
     var result = mk('p', '', 'practice-result');
 
     var form = mk('form', '', 'practice-form');
@@ -220,9 +222,9 @@ var Practice = {
     var list = mk('div', '', 'table-box');
     var quit = mk('button', '放棄這局', 'secondary');
     quit.type = 'button';
-    [cards, chart, result, form, listTitle, list, quit].forEach(function (n) { root.appendChild(n); });
+    [cards, indBar, chart, subChart, result, form, listTitle, list, quit].forEach(function (n) { root.appendChild(n); });
 
-    Practice.els = { cards: cards, chart: chart, result: result, form: form, side: sideWrap, qty: qty, all: all,
+    Practice.els = { cards: cards, indBar: indBar, chart: chart, subChart: subChart, result: result, form: form, side: sideWrap, qty: qty, all: all,
       reason: reason, btn: btn, msg: msg, list: list, quit: quit };
     var sync = function () {
       var a = Practice.getAction();
@@ -254,9 +256,11 @@ var Practice = {
     e.cards.appendChild(Practice.card('總資產', Fmt.num(g.equity), Fmt.signClass(g.equity - 1000000)));
     e.btn.textContent = '送出，揭曉第 ' + next + ' 天';
     Practice.clearCharts();
-    Practice._charts.push(PriceChart.create(e.chart, Practice.toRows(g.bars), {
-      timeLabel: function (t) { var n = Practice.timeToN(t); return n === null ? '' : Practice.barLabel(n); }
-    }));
+    var timeLabel = function (t) { var n = Practice.timeToN(t); return n === null ? '' : Practice.barLabel(n); };
+    var rows = Practice.toRows(g.bars);
+    var handle = PriceChart.create(e.chart, rows, { timeLabel: timeLabel });
+    Practice._charts.push(handle);
+    Practice._charts.push(IndicatorPanel.attach(e.indBar, e.subChart, rows, handle, { timeLabel: timeLabel }));
     e.list.textContent = '';
     if (g.steps.length === 0) { e.list.appendChild(mk('p', '還沒有揭曉任何一天', 'empty')); return; }
     var byDay = {};
@@ -407,9 +411,13 @@ var Practice = {
     }
 
     root.appendChild(mk('h3', '真實 K 線（紅箭頭買、綠箭頭賣）'));
-    var kBox = mk('div', '', 'chart-box');
-    root.appendChild(kBox);
-    Practice._charts.push(PriceChart.create(kBox, review.real_bars, { markers: Practice.markers(review.steps) }));
+    var kBar = mk('div', '', 'ind-bar');
+    var kBox = mk('div', '', 'chart-box with-sub');
+    var kSub = mk('div', '', 'chart-box chart-sub');
+    [kBar, kBox, kSub].forEach(function (n) { root.appendChild(n); });
+    var kHandle = PriceChart.create(kBox, review.real_bars, { markers: Practice.markers(review.steps) });
+    Practice._charts.push(kHandle);
+    Practice._charts.push(IndicatorPanel.attach(kBar, kSub, review.real_bars, kHandle));
     root.appendChild(mk('p', '提醒：價格未還原除權息，除息日可能出現跳空，請自行判斷。', 'bench-note'));
 
     root.appendChild(mk('h3', '逐日回顧'));
